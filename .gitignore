@@ -31,16 +31,14 @@ docker-compose.yml
 .temp/
 
 # Database files
-
 *.sql.backup
 *.dump
 *.sqlite
 
 # Redis
 *.rdb
+redis/
 .redis/
-redis/dump.rdb
-redis/redis.conf
 
 # Compiled output
 .dist/
@@ -61,7 +59,7 @@ coverage/
 *.crt
 
 # Nginx
-nginx/nginx.conf
+nginx/
 
-#flyway
-flyway/sql/v1_initial_schema.sql
+# Flyway
+flyway/
