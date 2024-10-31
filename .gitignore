@@ -1,0 +1,65 @@
+# Environment variables
+*.env
+.env
+project.env
+flyway/test.env
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+
+# IDE and Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+.vs/
+
+# Deno specific
+.deno/
+*.lock.json
+
+# Docker
+.docker/
+docker-compose.override.yml
+docker-compose.yml
+
+# Cache and temporary files
+**/app-cache/
+*.log
+tmp/
+temp/
+
+# Database files
+*.sql.backup
+*.dump
+*.sqlite
+
+# Redis
+*.rdb
+redis/dump.rdb
+redis/redis.conf
+
+# Compiled output
+dist/
+build/
+out/
+
+# Debug files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Test coverage
+coverage/
+
+# Local certificates
+*.pem
+*.key
+*.crt
+
+# Nginx
+nginx/nginx.conf
+
+#flyway
+flyway/sql/v1_initial_schema.sql

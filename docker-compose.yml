@@ -1,0 +1,53 @@
+version: "3.4"
+
+services:
+  codify-api:
+    build: codify-api
+    image: codify-api
+    restart: "no"
+    volumes:
+      - ./codify-api:/app
+      - ./app-cache/:/app-cache
+    expose:
+      - 7777
+    depends_on:
+      - database
+      - flyway
+    env_file:
+      - project.env
+    deploy:
+      replicas: 2
+  
+  database:
+    container_name: codify-db
+    image: postgres:16.1
+    restart: "no"
+    env_file:
+      - project.env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  
+  flyway:
+    image: flyway/flyway:9.11.0-alpine
+    depends_on:
+      database:
+        condition: service_healthy
+    volumes:
+      - ./flyway/sql:/flyway/sql
+    command: -connectRetries=60 -baselineOnMigrate=true migrate
+    env_file:
+      - project.env
+  
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - codify-api
+    ports:
+      - 7800:7800
+
+
