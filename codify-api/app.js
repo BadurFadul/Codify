@@ -4,6 +4,14 @@ import * as submissionsService from "./Services/submissionsService.js";
 import { APIError } from "./errors.js";
 import { ServiceUnavailableError } from "./utils/errors.js";
 
+
+/*
+ * This is a test comment
+ * Written across multiple lines
+ * To demonstrate multi-line comments
+ */
+
+
 const sql = postgres({});
 const SERVER_ID = crypto.randomUUID();
 
