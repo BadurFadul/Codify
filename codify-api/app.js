@@ -5,8 +5,8 @@ import { APIError } from "./errors.js";
 // import { ServiceUnavailableError } from "./utils/errors.js";
 import { cacheMethodCalls } from "./Utils/cacheUtil.js";
 
-const cachedAssignmentsService = cacheMethodCalls(assignmentsService, ["getAssignments", "getAssignment", "addAssignment", "updateAssignment", "deleteAssignment"]);
-const cachedSubmissionsService = cacheMethodCalls(submissionsService, ["getSubmission", "getUserPoints", "hasPendingSubmission", "updateSubmission", "deleteSubmission"]);
+const cachedAssignmentsService = cacheMethodCalls(assignmentsService, ["getAssignments", "getAssignment", "addAssignment", "updateAssignment", "deleteAssignment", "seedAssignments"]);
+const cachedSubmissionsService = cacheMethodCalls(submissionsService, ["getSubmission", "getUserPoints", "hasPendingSubmission", "updateSubmission", "deleteSubmission", "seedSubmissions"]);
 
 
 /*
@@ -154,6 +154,27 @@ const handleDeleteSubmission = async (req, urlMapping) => {
   }
 };
 
+const handleSeedDatabase = async (req) => {
+  try {
+    // Seed assignments first since submissions depend on them
+    const assignments = await cachedAssignmentsService.seedAssignments();
+    const submissions = await cachedSubmissionsService.seedSubmissions();
+
+    return new Response(JSON.stringify({
+      message: "Database seeded successfully",
+      data: {
+        assignments: assignments,
+        submissions: submissions
+      }
+    }), { 
+      status: 201,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  } catch (error) {
+    return handleError(error);
+  }
+};
+
 const handleError = (error) => {
   console.error(error);
   
@@ -237,6 +258,11 @@ const urlMapping = [
     method: "DELETE",
     pattern: new URLPattern({ pathname: "/submissions/:id" }),
     fn: handleDeleteSubmission
+  },
+  {
+    method: "POST",
+    pattern: new URLPattern({ pathname: "/seed" }),
+    fn: handleSeedDatabase
   }
 ];
 

@@ -1,7 +1,7 @@
 CREATE TABLE programming_assignments (
   id SERIAL PRIMARY KEY,
   title TEXT NOT NULL,
-  assignment_order INTEGER NOT NULL,
+  assignment_order INTEGER NOT NULL UNIQUE,
   handout TEXT NOT NULL,
   test_code TEXT NOT NULL
 );

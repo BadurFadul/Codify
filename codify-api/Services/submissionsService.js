@@ -150,12 +150,61 @@ const getUserSubmissions = async (user_uuid, programming_assignment_id) => {
   `;
 };
 
+const seedSubmissions = async () => {
+  const sampleSubmissions = [
+    {
+      programming_assignment_id: 1,
+      code: "let x = 10;",
+      user_uuid: "test-user-1",
+      status: "processed",
+      grader_feedback: "Good work!",
+      correct: true
+    },
+    {
+      programming_assignment_id: 1,
+      code: "var x;",
+      user_uuid: "test-user-2",
+      status: "processed",
+      grader_feedback: "Variable needs to be initialized",
+      correct: false
+    },
+    {
+      programming_assignment_id: 2,
+      code: "function add(a,b) { return a + b; }",
+      user_uuid: "test-user-1",
+      status: "processed",
+      grader_feedback: "Perfect implementation",
+      correct: true
+    }
+  ];
+
+  const results = [];
+  for (const submission of sampleSubmissions) {
+    const result = await sql`
+      INSERT INTO programming_assignment_submissions
+      (programming_assignment_id, code, user_uuid, status, grader_feedback, correct)
+      VALUES (
+        ${submission.programming_assignment_id}, 
+        ${submission.code},
+        ${submission.user_uuid},
+        ${submission.status}::SUBMISSION_STATUS,
+        ${submission.grader_feedback},
+        ${submission.correct}
+      )
+      RETURNING *
+    `;
+    results.push(result[0]);
+  }
+  return results;
+};
+
 export { 
   getSubmission, 
   addSubmission, 
   updateSubmission,
   deleteSubmission,
   getUserSubmissions,
-  getUserPoints
+  getUserPoints,
+  seedSubmissions
 };
 

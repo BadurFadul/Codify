@@ -47,10 +47,55 @@ const deleteAssignment = async (id) => {
   `;
 };
 
+const seedAssignments = async () => {
+  const sampleAssignments = [
+    {
+      title: "Introduction to Variables",
+      assignment_order: 1,
+      handout: "Learn about variables in programming",
+      test_code: "test('variables exist', () => { expect(x).toBeDefined(); });"
+    },
+    {
+      title: "Basic Functions",
+      assignment_order: 2,
+      handout: "Understanding functions and parameters",
+      test_code: "test('function returns correctly', () => { expect(add(2,2)).toBe(4); });"
+    },
+    {
+      title: "Loops and Arrays",
+      assignment_order: 3,
+      handout: "Working with loops and array manipulation",
+      test_code: "test('array length', () => { expect(processArray([1,2,3])).toHaveLength(3); });"
+    }
+  ];
+
+  const results = [];
+  for (const assignment of sampleAssignments) {
+    const result = await sql`
+      INSERT INTO programming_assignments 
+      (title, assignment_order, handout, test_code)
+      VALUES (
+        ${assignment.title}, 
+        ${assignment.assignment_order}, 
+        ${assignment.handout}, 
+        ${assignment.test_code}
+      )
+      ON CONFLICT (assignment_order) DO UPDATE 
+      SET title = EXCLUDED.title,
+          handout = EXCLUDED.handout,
+          test_code = EXCLUDED.test_code
+      RETURNING *
+    `;
+    results.push(result[0]);
+  }
+  return results;
+};
+
 export { 
   getAssignment, 
   getAssignments, 
   addAssignment, 
   updateAssignment, 
-  deleteAssignment 
+  deleteAssignment,
+  seedAssignments 
 };
