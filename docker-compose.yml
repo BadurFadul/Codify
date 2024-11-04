@@ -13,6 +13,7 @@ services:
     depends_on:
       - database
       - flyway
+      - redis
     env_file:
       - project.env
     deploy:
@@ -49,5 +50,13 @@ services:
       - codify-api
     ports:
       - 7800:7800
+  
+  redis:
+    image: redis:latest
+    command: redis-server /usr/local/etc/redis/redis.conf
+    volumes:
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+    expose:
+      - 6379
 
 

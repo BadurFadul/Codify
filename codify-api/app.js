@@ -2,7 +2,11 @@ import { postgres } from "./deps.js";
 import * as assignmentsService from "./Services/assignmentsService.js";
 import * as submissionsService from "./Services/submissionsService.js";
 import { APIError } from "./errors.js";
-import { ServiceUnavailableError } from "./utils/errors.js";
+// import { ServiceUnavailableError } from "./utils/errors.js";
+import { cacheMethodCalls } from "./Utils/cacheUtil.js";
+
+const cachedAssignmentsService = cacheMethodCalls(assignmentsService, ["getAssignments", "getAssignment", "addAssignment", "updateAssignment", "deleteAssignment"]);
+const cachedSubmissionsService = cacheMethodCalls(submissionsService, ["getSubmission", "getUserPoints", "hasPendingSubmission", "updateSubmission", "deleteSubmission"]);
 
 
 /*
@@ -21,7 +25,7 @@ const handleGetRoot = async (request) => {
 
 const handleGetAssignments = async (req) => {
   try {
-    const assignments = await assignmentsService.getAssignments();
+    const assignments = await cachedAssignmentsService.getAssignments();
     return new Response(JSON.stringify(assignments));
   } catch (error) {
     return handleError(error);
@@ -31,7 +35,7 @@ const handleGetAssignments = async (req) => {
 const handleGetAssignment = async (req, urlMapping) => {
   try {
     const id = urlMapping.pathname.groups.id;
-    const assignment = await assignmentsService.getAssignment(id);
+    const assignment = await cachedAssignmentsService.getAssignment(id);
     return new Response(JSON.stringify(assignment));
   } catch (error) {
     return handleError(error);
@@ -41,7 +45,7 @@ const handleGetAssignment = async (req, urlMapping) => {
 const handlePostAssignment = async (req) => {
   try {
     const body = await req.json();
-    const result = await assignmentsService.addAssignment(
+    const result = await cachedAssignmentsService.addAssignment(
       body.title, 
       body.assignment_order, 
       body.handout, 
@@ -57,7 +61,7 @@ const handleUpdateAssignment = async (req, urlMapping) => {
   try {
     const id = urlMapping.pathname.groups.id;
     const body = await req.json();
-    const result = await assignmentsService.updateAssignment(
+    const result = await cachedAssignmentsService.updateAssignment(
       id,
       body.title, 
       body.assignment_order, 
@@ -73,7 +77,7 @@ const handleUpdateAssignment = async (req, urlMapping) => {
 const handleDeleteAssignment = async (req, urlMapping) => {
   try {
     const id = urlMapping.pathname.groups.id;
-    const result = await assignmentsService.deleteAssignment(id);
+    const result = await cachedAssignmentsService.deleteAssignment(id);
     return new Response(JSON.stringify(result), { status: 200 });
   } catch (error) {
     return handleError(error);
@@ -83,7 +87,7 @@ const handleDeleteAssignment = async (req, urlMapping) => {
 const handleGetSubmission = async (req, urlMapping) => {
   try {
     const id = urlMapping.pathname.groups.id;
-    const submission = await submissionsService.getSubmission(id);
+    const submission = await cachedSubmissionsService.getSubmission(id);
     return new Response(JSON.stringify(submission));
   } catch (error) {
     return handleError(error);
@@ -93,7 +97,7 @@ const handleGetSubmission = async (req, urlMapping) => {
 const handlePostSubmission = async (req) => {
   try {
     const body = await req.json();
-    const result = await submissionsService.addSubmission(
+    const result = await cachedSubmissionsService.addSubmission(
       body.programming_assignment_id,
       body.code,
       body.user_uuid
@@ -107,7 +111,7 @@ const handlePostSubmission = async (req) => {
 const handleGetUserPoints = async (req, urlMapping) => {
   try {
     const user_uuid = urlMapping.pathname.groups.user_uuid;
-    const points = await submissionsService.getUserPoints(user_uuid);
+    const points = await cachedSubmissionsService.getUserPoints(user_uuid);
     return new Response(JSON.stringify({ points }));
   } catch (error) {
     return handleError(error);
@@ -117,7 +121,7 @@ const handleGetUserPoints = async (req, urlMapping) => {
 const handleCheckPendingSubmission = async (req, urlMapping) => {
   try {
     const user_uuid = urlMapping.pathname.groups.user_uuid;
-    const hasPending = await submissionsService.hasPendingSubmission(user_uuid);
+    const hasPending = await cachedSubmissionsService.hasPendingSubmission(user_uuid);
     return new Response(JSON.stringify({ has_pending: hasPending }));
   } catch (error) {
     return handleError(error);
@@ -128,7 +132,7 @@ const handleUpdateSubmission = async (req, urlMapping) => {
   try {
     const id = urlMapping.pathname.groups.id;
     const body = await req.json();
-    const result = await submissionsService.updateSubmission(
+    const result = await cachedSubmissionsService.updateSubmission(
       id,
       body.status,
       body.grader_feedback,
@@ -143,7 +147,7 @@ const handleUpdateSubmission = async (req, urlMapping) => {
 const handleDeleteSubmission = async (req, urlMapping) => {
   try {
     const id = urlMapping.pathname.groups.id;
-    const result = await submissionsService.deleteSubmission(id);
+    const result = await cachedSubmissionsService.deleteSubmission(id);
     return new Response(JSON.stringify(result), { status: 200 });
   } catch (error) {
     return handleError(error);
